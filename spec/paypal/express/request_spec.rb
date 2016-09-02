@@ -542,6 +542,37 @@ describe Paypal::Express::Request do
         :CURRENCYCODE => :JPY
       }
     end
+
+    it 'shhould accept details item parameters' do
+      expect do
+        instance.charge! 'billing_agreement_id', 1000, :currency_code => :JPY,
+          :items => [
+            {
+              :category => "Digital",
+              :name => "Dummy",
+              :description => "Dummy Description",
+              :amount => 1000,
+              :number => "1234",
+              :quantity => 1,
+              :tax_amount => 100
+            }
+          ]
+      end.to request_to nvp_endpoint, :post
+      instance._method_.should == :DoReferenceTransaction
+      instance._sent_params_.should == {
+        :REFERENCEID => 'billing_agreement_id',
+        :AMT => '1000.00',
+        :PAYMENTACTION => :Sale,
+        :CURRENCYCODE => :JPY,
+        :L_ITEMCATEGORY0 => "Digital",
+        :L_NAME0 => "Dummy",
+        :L_DESC0 => "Dummy Description",
+        :L_AMT0 => 1000,
+        :L_NUMBER0 => "1234",
+        :L_QTY0 => 1,
+        :L_TAXAMT0 => 100
+      }
+    end
   end
 
   describe '#revoke!' do

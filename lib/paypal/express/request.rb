@@ -153,6 +153,22 @@ module Paypal
         if options[:currency_code]
           params[:CURRENCYCODE] = options[:currency_code]
         end
+        # Payment Details Item Fields
+        if options[:items]
+          options[:items].each_with_index do |item, index|
+            {
+              :category => "L_ITEMCATEGORY",
+              :name => "L_NAME",
+              :description => "L_DESC",
+              :amount => "L_AMT",
+              :number => "L_NUMBER",
+              :quantity => "L_QTY",
+              :tax_amount => "L_TAXAMT",
+            }.each do |key, prefix|
+              params[(prefix + index.to_s).to_sym] = item[key]
+            end
+          end
+        end
         response = self.request :DoReferenceTransaction, params
         Response.new response
       end
